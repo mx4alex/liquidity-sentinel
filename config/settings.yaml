@@ -1,0 +1,91 @@
+data:
+  raw_dir: data/raw
+  processed_dir: data/processed
+  cache_ttl_hours: 24
+
+http:
+  verify_ssl: true
+
+pipeline:
+  enrich_repo_demand: true
+
+normalization:
+  mad_window_years: 3
+  mad_min_periods: 30
+
+modules:
+  m1:
+    end_of_period_days: 5
+  m2:
+    focus_term_days: 7
+    demand_cover_threshold: 2.0
+  m3:
+    nedospros_cover_threshold: 1.2
+    perespros_cover_threshold: 2.0
+  m4:
+    tax_week_before_days: 5
+    tax_week_after_days: 5
+    seasonal_factor_min: 1.0
+    seasonal_factor_max: 1.4
+  m5:
+    budget_drain_weekly_bn: 400.0
+    budget_drain_zscore: 2.0
+
+aggregation:
+  method: weighted_interpretable
+  lsi_green_max: 40
+  lsi_yellow_max: 70
+  event_fill_days: 21
+  percentile_weight: 0.0
+  percentile_window_days: 756
+  logistic:
+    k: 0.55
+    x0: 1.5
+  scale_low_pct: 0.50
+  scale_low_lsi: 18.0
+  scale_high_pct: 0.96
+  scale_high_lsi: 82.0
+  weights:
+    m1: 0.25
+    m2: 0.30
+    m3: 0.25
+    m5: 0.20
+  overlap:
+    tax_week_downweight: 0.65
+    modules_to_downweight: [m1, m2, m5]
+
+backtest:
+  stress_episodes:
+    - name: "December 2014"
+      start: "2014-12-01"
+      end: "2014-12-31"
+    - name: "February–March 2022"
+      start: "2022-02-01"
+      end: "2022-03-31"
+    - name: "August 2023"
+      start: "2023-08-01"
+      end: "2023-08-31"
+  holdout_start: "2020-01-01"
+  sensitivity_pct: 0.20
+
+sources:
+  cbr_reserves_xlsx: https://www.cbr.ru/vfs/hd_base/RReserves/required_reserves_table.xlsx
+  cbr_ruonia: https://www.cbr.ru/hd_base/ruonia/
+  cbr_repo: https://www.cbr.ru/hd_base/repo/
+  cbr_keyrate: https://www.cbr.ru/hd_base/keyrate/
+  cbr_bliquidity: https://www.cbr.ru/hd_base/bliquidity/
+  cbr_sors: https://www.cbr.ru/statistics/bank_sector/sors/
+  fns_calendar: https://www.nalog.gov.ru/rn77/calendar/
+  roskazna_deposits: https://roskazna.gov.ru/finansovye-operacii/razmeshchenie-sredstv-edinogo-kaznachejskogo-scheta/razmeshchenie-sredstv-edinogo-kaznachejskogo-scheta-na-bankovskih-depozitah
+  minfin_ofz_index: https://minfin.gov.ru/ru/perfomance/debt/internal/act/inofz/
+
+llm:
+  enabled: true
+  provider: yandex
+  model: yandexgpt-5.1/latest
+  folder_id: null
+  api_url: https://llm.api.cloud.yandex.net/foundationModels/v1/completion
+  temperature: 0.3
+  max_tokens: 1500
+  auto_comment: true
+  rag_top_k: 8
