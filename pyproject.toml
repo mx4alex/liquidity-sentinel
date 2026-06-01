@@ -1,0 +1,70 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ru-liquidity-sentinel"
+version = "0.1.0"
+description = "RU Liquidity Sentinel - система раннего предупреждения стресса ликвидности"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "PSB Team" }]
+dependencies = [
+    "pandas>=2.2",
+    "numpy>=1.26",
+    "scipy>=1.12",
+    "scikit-learn>=1.4",
+    "requests>=2.31",
+    "openpyxl>=3.1",
+    "lxml>=5.0",
+    "html5lib>=1.1",
+    "beautifulsoup4>=4.12",
+    "pydantic>=2.6",
+    "pydantic-settings>=2.2",
+    "pyyaml>=6.0",
+    "structlog>=24.1",
+    "tenacity>=8.2",
+    "python-dateutil>=2.9",
+    "plotly>=5.20",
+    "streamlit>=1.32",
+    "shap>=0.45",
+    "httpx>=0.27",
+    "certifi>=2024.2",
+]
+
+[project.optional-dependencies]
+llm = [
+    "chromadb>=0.4",
+    "sentence-transformers>=2.6",
+]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=4.1",
+    "ruff>=0.3",
+    "mypy>=1.9",
+    "pandas-stubs>=2.2",
+]
+[project.scripts]
+sentinel = "ru_liquidity_sentinel.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ru_liquidity_sentinel"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests", "dashboard"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+markers = ["integration: live network tests"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+packages = ["ru_liquidity_sentinel"]
