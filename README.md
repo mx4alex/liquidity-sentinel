@@ -13,3 +13,31 @@
 | **M5** | Казначейство (SORS, Росказна) |
 | **LSI** | Агрегация 0–100, вклад модулей, backtest, sensitivity |
 | **LLM** | Аналитичесткий комментарий, интерактивный чат |
+
+## Быстрый старт
+
+```bash
+# история ОФЗ
+python scripts/build_ofz_from_bliquidity.py
+
+# Сбор данных и расчёт LSI
+sentinel run
+
+# Дашборд
+sentinel dashboard
+
+# Ежедневный запуск
+./scripts/daily_run.sh
+
+# Docker
+docker compose up dashboard 
+```
+
+## Конфигурация
+
+- `config/settings.yaml` - веса LSI, пороги, URL источников, эпизоды backtest
+
+## Тесты
+
+```bash
+pytest -q
